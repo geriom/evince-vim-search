@@ -1,0 +1,19 @@
+#!/bin/bash
+
+EDITORCMD="vim --servername 'LATEX' --remote-silent '+%l<Enter>:match Search /\%%ll/' %f"
+
+PDFFILE="$1"
+if [ -f "$PDFFILE" ];then
+	if [ -f "${PDFFILE%%.pdf}.synctex.gz" ];then
+		evince_backward_search "$PDFFILE" "$EDITORCMD"&
+		BACKWARD_SEARCH_PID=$!
+		echo $BACKWARD_SEARCH_PID
+	fi
+fi
+
+/usr/bin/evince "$@"
+
+if [ "$BACKWARD_SEARCH_PID" ];then
+	echo "Killing $BACKWARD_SEARCH_PID"
+	kill $BACKWARD_SEARCH_PID
+fi
